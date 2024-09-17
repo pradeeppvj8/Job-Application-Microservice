@@ -10,6 +10,7 @@
         <module name="review-ms" />
         <module name="job-ms" />
         <module name="company-ms" />
+        <module name="service-registry" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,6 +19,7 @@
       <module name="company-ms" options="-parameters" />
       <module name="job-ms" options="-parameters" />
       <module name="review-ms" options="-parameters" />
+      <module name="service-registry" options="-parameters" />
     </option>
   </component>
 </project>

@@ -1,14 +1,18 @@
 package com.pradeep.jobms.job.service.impl;
 
+import com.pradeep.jobms.job.dto.JobWithCompanyDTO;
 import com.pradeep.jobms.job.exception.JobNotFoundException;
+import com.pradeep.jobms.job.external.Company;
 import com.pradeep.jobms.job.model.Job;
 import com.pradeep.jobms.job.repository.JobRepository;
 import com.pradeep.jobms.job.service.interfaces.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,8 +20,19 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
 
     @Override
-    public List<Job> fetchAllJobs() {
-        return jobRepository.findAll();
+    public List<JobWithCompanyDTO> fetchAllJobs() {
+        List<Job> jobs = jobRepository.findAll();
+        return jobs.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public JobWithCompanyDTO convertToDTO(Job job) {
+        RestTemplate restTemplate = new RestTemplate();
+        JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
+        jobWithCompanyDTO.setJob(job);
+        Company company = restTemplate.getForObject("http://localhost:8081/companies/get-company/" +
+                job.getCompanyId(), Company.class);
+        jobWithCompanyDTO.setCompany(company);
+        return jobWithCompanyDTO;
     }
 
     @Override

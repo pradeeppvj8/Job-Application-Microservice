@@ -1,5 +1,6 @@
 package com.pradeep.jobms.job.controller;
 
+import com.pradeep.jobms.job.dto.JobWithCompanyDTO;
 import com.pradeep.jobms.job.exception.JobNotFoundException;
 import com.pradeep.jobms.job.model.Job;
 import com.pradeep.jobms.job.service.interfaces.JobService;
@@ -18,7 +19,7 @@ public class JobController {
     private Long nextId = 1L;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Job>> fetchAllJobs() {
+    public ResponseEntity<List<JobWithCompanyDTO>> fetchAllJobs() {
         return ResponseEntity.ok(jobService.fetchAllJobs());
     }
 
