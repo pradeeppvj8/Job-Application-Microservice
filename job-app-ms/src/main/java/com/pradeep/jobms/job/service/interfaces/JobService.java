@@ -1,17 +1,17 @@
 package com.pradeep.jobms.job.service.interfaces;
 
 
-import com.pradeep.jobms.job.dto.JobWithCompanyDTO;
+import com.pradeep.jobms.job.dto.JobDTO;
 import com.pradeep.jobms.job.model.Job;
 
 import java.util.List;
 
 public interface JobService {
-    List<JobWithCompanyDTO> fetchAllJobs();
+    List<JobDTO> fetchAllJobs();
 
     void createJob(Job job);
 
-    Job findJobById(Long id);
+    JobDTO findJobById(Long id);
 
     boolean deleteJobById(Long id);
 

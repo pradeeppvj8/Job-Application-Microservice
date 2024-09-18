@@ -1,6 +1,6 @@
 package com.pradeep.jobms.job.controller;
 
-import com.pradeep.jobms.job.dto.JobWithCompanyDTO;
+import com.pradeep.jobms.job.dto.JobDTO;
 import com.pradeep.jobms.job.exception.JobNotFoundException;
 import com.pradeep.jobms.job.model.Job;
 import com.pradeep.jobms.job.service.interfaces.JobService;
@@ -19,7 +19,7 @@ public class JobController {
     private Long nextId = 1L;
 
     @GetMapping("/all")
-    public ResponseEntity<List<JobWithCompanyDTO>> fetchAllJobs() {
+    public ResponseEntity<List<JobDTO>> fetchAllJobs() {
         return ResponseEntity.ok(jobService.fetchAllJobs());
     }
 
@@ -33,8 +33,8 @@ public class JobController {
     @GetMapping("/find-job/{id}")
     public ResponseEntity<?> findJobById(@PathVariable Long id) {
         try {
-            Job job = jobService.findJobById(id);
-            return ResponseEntity.ok(job);
+            JobDTO jobDTO = jobService.findJobById(id);
+            return ResponseEntity.ok(jobDTO);
         } catch (JobNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
