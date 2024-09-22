@@ -10,6 +10,7 @@ import com.pradeep.jobms.job.mapper.JobMapper;
 import com.pradeep.jobms.job.model.Job;
 import com.pradeep.jobms.job.repository.JobRepository;
 import com.pradeep.jobms.job.service.interfaces.JobService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,9 +32,17 @@ public class JobServiceImpl implements JobService {
     private final ReviewClient reviewClient;
 
     @Override
+    @CircuitBreaker(name = "companyBreaker" , fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> fetchAllJobs() {
         List<Job> jobs = jobRepository.findAll();
         return jobs.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public List<String> companyBreakerFallback(Exception e) {
+        List<String> messages = new ArrayList<>();
+        messages.add("There has been an error");
+        messages.add("Error Info - " + e.getMessage());
+        return messages;
     }
 
     public JobDTO convertToDTO(Job job) {
