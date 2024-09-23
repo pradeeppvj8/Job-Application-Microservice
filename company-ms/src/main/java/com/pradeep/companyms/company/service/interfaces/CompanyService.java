@@ -1,5 +1,6 @@
 package com.pradeep.companyms.company.service.interfaces;
 
+import com.pradeep.companyms.company.dto.ReviewMessage;
 import com.pradeep.companyms.company.model.Company;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface CompanyService {
     boolean deleteCompany(Long id);
 
     Company getCompanyById(Long id);
+
+    void updateCompanyRating(ReviewMessage reviewMessage);
 }

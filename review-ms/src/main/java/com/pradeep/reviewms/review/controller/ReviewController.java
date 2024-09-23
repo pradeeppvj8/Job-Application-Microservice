@@ -1,5 +1,6 @@
 package com.pradeep.reviewms.review.controller;
 
+import com.pradeep.reviewms.review.messaging.ReviewMessageProducer;
 import com.pradeep.reviewms.review.model.Review;
 import com.pradeep.reviewms.review.service.interfaces.ReviewService;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
+    private final ReviewMessageProducer reviewMessageProducer;
 
     @GetMapping("/get-all-reviews")
     public ResponseEntity<List<Review>> getAllReviewsForCompany(@RequestParam Long companyId) {
@@ -27,6 +29,7 @@ public class ReviewController {
         boolean isReviewAdded = reviewService.addReview(companyId, review);
 
         if (isReviewAdded) {
+            reviewMessageProducer.sendMessage(review);
             return new ResponseEntity<>("Review added successfully", HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Review not added", HttpStatus.NOT_FOUND);
@@ -59,5 +62,11 @@ public class ReviewController {
         } else {
             return new ResponseEntity<>("Review Could Not Deleted", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/average-rating")
+    public double getAverageRating(@RequestParam Long companyId) {
+        List<Review> reviews = reviewService.getAllReviewsForCompany(companyId);
+        return reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0);
     }
 }

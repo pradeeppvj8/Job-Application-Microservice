@@ -1,5 +1,7 @@
 package com.pradeep.companyms.company.service.impl;
 
+import com.pradeep.companyms.company.client.ReviewClient;
+import com.pradeep.companyms.company.dto.ReviewMessage;
 import com.pradeep.companyms.company.model.Company;
 import com.pradeep.companyms.company.repository.CompanyRepository;
 import com.pradeep.companyms.company.service.interfaces.CompanyService;
@@ -13,6 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
+    private final ReviewClient reviewClient;
 
     @Override
     public List<Company> getAllCompanies() {
@@ -52,5 +55,14 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Company getCompanyById(Long id) {
         return companyRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void updateCompanyRating(ReviewMessage reviewMessage) {
+        Company company = companyRepository.findById(reviewMessage.getCompanyId())
+                .orElseThrow(() -> new RuntimeException("Company not found with ID - " + reviewMessage.getCompanyId()));
+        double averageRating = reviewClient.getAverageRating(company.getId());
+        company.setRating(averageRating);
+        companyRepository.save(company);
     }
 }
