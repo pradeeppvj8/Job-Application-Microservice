@@ -46,7 +46,95 @@ services:
     networks:
       - postgres
 
+  config-server:
+    container_name: config-server
+    image: pradeeppvj/config-server:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service-registry
+    networks:
+      - postgres
+      - microservices-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  service-registry:
+    container_name: service-registry
+    image: pradeeppvj/service-registry:latest
+    ports:
+      - "8761:8761"
+    depends_on:
+      - rabbitmq
+      - zipkin
+      - postgres
+      - pgadmin
+    networks:
+      - postgres
+      - microservices-network
+
+  company-ms:
+    container_name: company-ms
+    image: pradeeppvj/company-ms:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config-server
+      - service-registry
+    networks:
+      - postgres
+      - microservices-network
+    environment:                     
+      - SPRING_PROFILES_ACTIVE=docker
+
+  job-ms:
+    container_name: job-ms
+    image: pradeeppvj/job-ms:latest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config-server
+      - service-registry
+    networks:
+      - postgres
+      - microservices-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULT_ZONE=http://service-registry:8761/eureka
+
+  review-ms:
+    container_name: review-ms
+    image: pradeeppvj/review-ms:latest
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - service-registry
+    networks:
+      - postgres
+      - microservices-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULT_ZONE=http://service-registry:8761/eureka
+
+  api-gateway:
+     container_name: api-gateway
+     image: pradeeppvj/api-gateway:latest
+     ports:
+       - "8084:8084"
+     depends_on:
+       - config-server
+       - service-registry
+     networks:
+       - postgres
+       - microservices-network
+     environment:
+       - SPRING_PROFILES_ACTIVE=docker
+       - EUREKA_CLIENT_SERVICEURL_DEFAULT_ZONE=http://service-registry:8761/eureka
+         
 networks:
+  microservices-network:
+    driver: bridge
   postgres:
     driver: bridge
 
